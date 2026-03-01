@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌟 لعبة الأنماط اللغوية 🌟</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1b2a;
+      --card: #1a2e45;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: white;
+    }
+
+    .bg-bubbles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.13;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(110vh) scale(0);
+        opacity: 0
+      }
+
+      10% {
+        opacity: .13
+      }
+
+      90% {
+        opacity: .08
+      }
+
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0
+      }
+    }
+
+    #starsCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ===== MAIN SCREEN ===== */
+    #mainScreen {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .logo-anim {
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-14px)
+      }
+    }
+
+    .game-title {
+      font-size: clamp(1.9rem, 5.5vw, 3.6rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #FFD93D, #FF6B6B, #CC5DE8, #4D96FF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 18px rgba(255, 217, 61, .5));
+      line-height: 1.2;
+      margin: 13px 0;
+    }
+
+    .game-subtitle {
+      font-size: 1.1rem;
+      color: #adb5bd;
+      margin-bottom: 34px;
+    }
+
+    .mode-cards {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .mode-card {
+      background: linear-gradient(135deg, var(--card), #243b55);
+      border: 2px solid transparent;
+      border-radius: 22px;
+      padding: 24px 18px;
+      cursor: pointer;
+      width: 235px;
+      transition: all .3s;
+    }
+
+    .mode-card:hover {
+      transform: translateY(-7px) scale(1.03);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, .4);
+      border-color: var(--mc);
+    }
+
+    .mode-card .icon {
+      font-size: 2.6rem;
+      margin-bottom: 9px;
+      display: block;
+    }
+
+    .mode-card .mode-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      margin-bottom: 5px;
+    }
+
+    .mode-card .mode-desc {
+      font-size: .82rem;
+      color: #adb5bd;
+      line-height: 1.5;
+    }
+
+    .mode-card .q-count {
+      display: inline-block;
+      margin-top: 9px;
+      background: rgba(255, 255, 255, .1);
+      border-radius: 20px;
+      padding: 3px 13px;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    .all-btn {
+      background: linear-gradient(135deg, #FFD93D, #FF6B6B);
+      color: #1a1a1a;
+      border: none;
+      padding: 15px 38px;
+      border-radius: 50px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all .2s;
+      margin-top: 30px;
+    }
+
+    .all-btn:hover {
+      transform: scale(1.06);
+      filter: brightness(1.1);
+    }
+
+    .teacher-credit {
+      position: fixed;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      text-align: center;
+      color: rgba(255, 255, 255, .28);
+      font-size: .63rem;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* ===== GAME SCREEN ===== */
+    #gameScreen {
+      display: none;
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .game-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 820px;
+      margin: 0 auto 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, .1);
+      border: none;
+      color: white;
+      padding: 9px 17px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Tajawal', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, .2);
+      transform: scale(1.05);
+    }
+
+    .score-badge {
+      background: linear-gradient(135deg, #FFD93D, #FF922B);
+      color: #1a1a1a;
+      padding: 9px 17px;
+      border-radius: 50px;
+      font-weight: 900;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .progress-wrap {
+      max-width: 820px;
+      margin: 0 auto 18px;
+      background: rgba(255, 255, 255, .1);
+      border-radius: 50px;
+      height: 11px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 50px;
+      background: linear-gradient(90deg, #6BCB77, #4D96FF);
+      transition: width .5s ease;
+      position: relative;
+    }
+
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%)
+      }
+
+      100% {
+        transform: translateX(100%)
+      }
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #1a2e45, #243b55);
+      border-radius: 26px;
+      padding: 28px;
+      max-width: 820px;
+      margin: 0 auto;
+      border: 2px solid rgba(255, 255, 255, .08);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, .4);
+      animation: slideIn .4s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(26px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .q-number {
+      font-size: .82rem;
+      color: #6BCB77;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 11px;
+    }
+
+    .q-text {
+      font-size: clamp(1.2rem, 3.2vw, 1.8rem);
+      font-weight: 700;
+      line-height: 2;
+      margin-bottom: 18px;
+      color: #f8f9fa;
+    }
+
+    .q-text .blank {
+      display: inline-block;
+      background: rgba(255, 217, 61, .15);
+      border-bottom: 3px solid #FFD93D;
+      min-width: 75px;
+      padding: 2px 11px;
+      border-radius: 7px;
+      color: #FFD93D;
+      font-weight: 900;
+      text-align: center;
+      animation: blinkB 1.5s ease-in-out infinite;
+    }
+
+    @keyframes blinkB {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .35
+      }
+    }
+
+    /* AUDIO BTN */
+    .read-btn {
+      background: linear-gradient(135deg, #4D96FF, #CC5DE8);
+      border: none;
+      color: white;
+      padding: 11px 22px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Tajawal', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      margin: 0 auto 18px;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .read-btn:hover {
+      transform: scale(1.05);
+      filter: brightness(1.15);
+    }
+
+    .read-btn.playing {
+      background: linear-gradient(135deg, #FF922B, #FF6B6B);
+      animation: playPulse .8s infinite alternate;
+    }
+
+    @keyframes playPulse {
+      from {
+        transform: scale(1)
+      }
+
+      to {
+        transform: scale(1.06)
+      }
+    }
+
+    .wave-dots {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+    }
+
+    .wave-dots span {
+      width: 4px;
+      border-radius: 4px;
+      background: white;
+      animation: waveD .8s ease-in-out infinite;
+    }
+
+    .wave-dots span:nth-child(1) {
+      height: 7px;
+      animation-delay: 0s;
+    }
+
+    .wave-dots span:nth-child(2) {
+      height: 13px;
+      animation-delay: .15s;
+    }
+
+    .wave-dots span:nth-child(3) {
+      height: 17px;
+      animation-delay: .3s;
+    }
+
+    .wave-dots span:nth-child(4) {
+      height: 13px;
+      animation-delay: .45s;
+    }
+
+    .wave-dots span:nth-child(5) {
+      height: 7px;
+      animation-delay: .6s;
+    }
+
+    @keyframes waveD {
+
+      0%,
+      100% {
+        transform: scaleY(1)
+      }
+
+      50% {
+        transform: scaleY(1.7)
+      }
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .option-btn {
+      background: rgba(255, 255, 255, .07);
+      border: 2px solid rgba(255, 255, 255, .15);
+      color: white;
+      padding: 16px 11px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      transition: all .2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, .15);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width .4s, height .4s;
+    }
+
+    .option-btn:hover:not(:disabled)::before {
+      width: 270px;
+      height: 270px;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #FFD93D;
+      transform: translateY(-4px);
+      box-shadow: 0 9px 26px rgba(255, 217, 61, .2);
+    }
+
+    .option-btn.correct {
+      background: linear-gradient(135deg, #2ecc71, #6BCB77) !important;
+      border-color: #2ecc71 !important;
+      transform: scale(1.05);
+      box-shadow: 0 0 28px rgba(46, 204, 113, .6) !important;
+      animation: correctPop .4s ease;
+    }
+
+    .option-btn.wrong {
+      background: linear-gradient(135deg, #e74c3c, #FF6B6B) !important;
+      border-color: #e74c3c !important;
+      animation: wrongShake .4s ease;
+    }
+
+    @keyframes correctPop {
+      0% {
+        transform: scale(1)
+      }
+
+      50% {
+        transform: scale(1.15)
+      }
+
+      100% {
+        transform: scale(1.05)
+      }
+    }
+
+    @keyframes wrongShake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      25% {
+        transform: translateX(-10px)
+      }
+
+      75% {
+        transform: translateX(10px)
+      }
+    }
+
+    .option-btn:disabled {
+      cursor: not-allowed;
+    }
+
+    /* MASCOT */
+    .mascot {
+      position: fixed;
+      bottom: 24px;
+      right: 16px;
+      width: 88px;
+      cursor: pointer;
+      z-index: 20;
+      animation: mascotB 3s ease-in-out infinite;
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .5));
+    }
+
+    @keyframes mascotB {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg)
+      }
+
+      50% {
+        transform: translateY(-10px) rotate(3deg)
+      }
+    }
+
+    .mascot:hover {
+      animation: none;
+      transform: scale(1.12) rotate(-5deg);
+    }
+
+    .speech-bubble {
+      position: fixed;
+      bottom: 122px;
+      right: 14px;
+      background: white;
+      color: #1a1a1a;
+      padding: 10px 14px;
+      border-radius: 16px 16px 0 16px;
+      font-size: .82rem;
+      font-weight: 700;
+      max-width: 165px;
+      text-align: center;
+      z-index: 20;
+      box-shadow: 0 8px 26px rgba(0, 0, 0, .3);
+      opacity: 0;
+      transform: scale(.8);
+      transition: all .3s;
+      pointer-events: none;
+    }
+
+    .speech-bubble.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* RESULT */
+    #resultScreen {
+      display: none;
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .result-card {
+      background: linear-gradient(135deg, #1a2e45, #243b55);
+      border-radius: 30px;
+      padding: 44px 34px;
+      max-width: 540px;
+      margin: 0 auto;
+      text-align: center;
+      border: 2px solid rgba(255, 255, 255, .1);
+      box-shadow: 0 28px 75px rgba(0, 0, 0, .5);
+      animation: slideIn .5s ease;
+    }
+
+    .result-emoji {
+      font-size: 4.8rem;
+      margin-bottom: 14px;
+      display: block;
+      animation: bounce 1s infinite;
+    }
+
+    .result-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin-bottom: 7px;
+    }
+
+    .result-score {
+      font-size: 3.6rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #FFD93D, #FF922B);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 14px 0;
+    }
+
+    .result-msg {
+      font-size: 1.08rem;
+      color: #adb5bd;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .stars-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .star-big {
+      font-size: 2.8rem;
+      animation: starSpin .5s ease forwards;
+      opacity: 0;
+    }
+
+    .star-big.lit {
+      color: #FFD93D;
+      text-shadow: 0 0 18px rgba(255, 217, 61, .8);
+    }
+
+    .star-big.dim {
+      color: #444;
+    }
+
+    @keyframes starSpin {
+      from {
+        opacity: 0;
+        transform: scale(0) rotate(-180deg)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) rotate(0)
+      }
+    }
+
+    .play-again-btn {
+      background: linear-gradient(135deg, #FFD93D, #FF922B);
+      color: #1a1a1a;
+      border: none;
+      padding: 14px 38px;
+      border-radius: 50px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all .2s;
+      margin: 7px;
+    }
+
+    .play-again-btn:hover {
+      transform: scale(1.07);
+      filter: brightness(1.1);
+    }
+
+    .home-btn {
+      background: rgba(255, 255, 255, .1);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, .2);
+      padding: 12px 34px;
+      border-radius: 50px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: .98rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      margin: 7px;
+    }
+
+    .home-btn:hover {
+      background: rgba(255, 255, 255, .2);
+      transform: scale(1.05);
+    }
+
+    /* FEEDBACK */
+    .feedback-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+
+    .feedback-overlay.show {
+      opacity: 1;
+    }
+
+    .feedback-msg {
+      font-size: clamp(2.8rem, 7.5vw, 5.5rem);
+      font-weight: 900;
+      text-shadow: 0 0 38px currentColor;
+      animation: feedbackPop .6s ease;
+    }
+
+    @keyframes feedbackPop {
+      0% {
+        transform: scale(.5) rotate(-10deg)
+      }
+
+      60% {
+        transform: scale(1.2) rotate(3deg)
+      }
+
+      100% {
+        transform: scale(1) rotate(0)
+      }
+    }
+
+    .points-float {
+      position: fixed;
+      font-size: 1.9rem;
+      font-weight: 900;
+      pointer-events: none;
+      z-index: 500;
+      color: #FFD93D;
+      text-shadow: 0 0 9px rgba(255, 217, 61, .8);
+      animation: floatPts 1.5s ease-out forwards;
+    }
+
+    @keyframes floatPts {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1)
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(-95px) scale(1.5)
+      }
+    }
+
+    .animated-icon {
+      display: inline-block;
+      animation: iconW 2s ease-in-out infinite;
+    }
+
+    @keyframes iconW {
+
+      0%,
+      100% {
+        transform: rotate(0)
+      }
+
+      25% {
+        transform: rotate(-8deg) scale(1.1)
+      }
+
+      75% {
+        transform: rotate(8deg) scale(1.1)
+      }
+    }
+
+    @media(max-width:600px) {
+      .mode-cards {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .mode-card {
+        width: 100%;
+        max-width: 305px;
+      }
+
+      .question-card {
+        padding: 15px;
+      }
+
+      .options-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .mascot {
+        width: 70px;
+        bottom: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-bubbles" id="bgBubbles"></div>
+  <canvas id="starsCanvas"></canvas>
+  <div class="feedback-overlay" id="feedbackOverlay"><span class="feedback-msg" id="feedbackMsg"></span></div>
+
+  <!-- ======== MAIN SCREEN ======== -->
+  <div id="mainScreen">
+    <div class="logo-anim">
+      <svg width="105" height="105" viewBox="0 0 120 120">
+        <defs>
+          <radialGradient id="sg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" style="stop-color:#FFD93D" />
+            <stop offset="100%" style="stop-color:#FF922B" />
+          </radialGradient>
+        </defs>
+        <polygon points="60,5 74,45 115,45 82,70 95,110 60,85 25,110 38,70 5,45 46,45" fill="url(#sg)"
+          filter="drop-shadow(0 0 14px rgba(255,217,61,.8))">
+          <animateTransform attributeName="transform" type="rotate" values="0 60 60;10 60 60;-10 60 60;0 60 60" dur="3s"
+            repeatCount="indefinite" />
+        </polygon>
+        <text x="60" y="70" text-anchor="middle" font-size="29" font-family="Tajawal" fill="white"
+          font-weight="900">ع</text>
+      </svg>
+    </div>
+    <h1 class="game-title">لعبة الأنماط اللغوية ✨</h1>
+    <p class="game-subtitle">للصف الثاني الابتدائي 🎓</p>
+    <div class="mode-cards">
+      <div class="mode-card" style="--mc:#FF6B6B" onclick="startGame('pronouns')">
+        <span class="icon"><svg width="50" height="50" viewBox="0 0 60 60">
+            <circle cx="30" cy="20" r="12" fill="#FF6B6B">
+              <animate attributeName="r" values="12;14;12" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <path d="M10,50 Q30,35 50,50" fill="none" stroke="#FF922B" stroke-width="4" stroke-linecap="round" />
+            <circle cx="20" cy="45" r="5" fill="#FFD93D" />
+            <circle cx="40" cy="45" r="5" fill="#FFD93D" />
+          </svg></span>
+        <div class="mode-title">🙋 الضمائر وأسماء الإشارة</div>
+        <div class="mode-desc">هو، هي، هم + هذا، هذه، هؤلاء + ذلك، تلك</div>
+        <span class="q-count">25 سؤال</span>
+      </div>
+      <div class="mode-card" style="--mc:#6BCB77" onclick="startGame('numbers')">
+        <span class="icon"><svg width="50" height="50" viewBox="0 0 60 60">
+            <rect x="5" y="25" width="15" height="25" rx="4" fill="#6BCB77">
+              <animate attributeName="height" values="25;30;25" dur="1.5s" repeatCount="indefinite" />
+              <animate attributeName="y" values="25;20;25" dur="1.5s" repeatCount="indefinite" />
+            </rect>
+            <rect x="23" y="15" width="15" height="35" rx="4" fill="#4D96FF">
+              <animate attributeName="height" values="35;40;35" dur="1.8s" repeatCount="indefinite" />
+              <animate attributeName="y" values="15;10;15" dur="1.8s" repeatCount="indefinite" />
+            </rect>
+            <rect x="41" y="5" width="15" height="45" rx="4" fill="#CC5DE8">
+              <animate attributeName="height" values="45;50;45" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="y" values="5;0;5" dur="2s" repeatCount="indefinite" />
+            </rect>
+          </svg></span>
+        <div class="mode-title">📚 المفرد والمثنى والجمع</div>
+        <div class="mode-desc">طالب، طالبة، معلم، معلمة</div>
+        <span class="q-count">4 أسئلة</span>
+      </div>
+      <div class="mode-card" style="--mc:#CC5DE8" onclick="startGame('prepositions')">
+        <span class="icon"><svg width="50" height="50" viewBox="0 0 60 60">
+            <rect x="15" y="30" width="30" height="20" rx="4" fill="#4D96FF" />
+            <circle cx="30" cy="18" r="10" fill="#CC5DE8">
+              <animate attributeName="cy" values="18;10;18" dur="2s" repeatCount="indefinite" />
+            </circle>
+          </svg></span>
+        <div class="mode-title">🏠 حروف الجر</div>
+        <div class="mode-desc">فوق، تحت، أمام، خلف<br>شاهد الصورة واختر!</div>
+        <span class="q-count">10 أسئلة</span>
+      </div>
+    </div>
+    <button class="all-btn" onclick="startGame('all')">🎮 العب جميع الأسئلة!</button>
+  </div>
+
+  <!-- ======== GAME SCREEN ======== -->
+  <div id="gameScreen">
+    <div class="game-header">
+      <button class="back-btn" onclick="goHome()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>الرئيسية
+      </button>
+      <div style="display:flex;align-items:center;gap:9px;">
+        <div class="score-badge"><svg width="17" height="17" viewBox="0 0 24 24" fill="#1a1a1a">
+            <polygon
+              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+          </svg><span id="scoreDisplay">0</span></div>
+        <div
+          style="background:rgba(255,255,255,.1);padding:9px 14px;border-radius:50px;font-weight:700;font-size:.9rem;">
+          <span id="qNumDisplay">1</span>/<span id="qTotalDisplay">10</span></div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="question-card" id="questionCard"></div>
+  </div>
+
+  <!-- ======== RESULT SCREEN ======== -->
+  <div id="resultScreen">
+    <div class="result-card">
+      <span class="result-emoji" id="resultEmoji">🏆</span>
+      <div class="result-title" id="resultTitle">أحسنت!</div>
+      <div class="stars-row" id="starsRow"></div>
+      <div class="result-score" id="resultScore">0/0</div>
+      <div class="result-msg" id="resultMsg">رائع!</div>
+      <div style="margin-top:24px;">
+        <button class="play-again-btn" onclick="playAgain()">🔄 العب مرة أخرى</button>
+        <button class="home-btn" onclick="goHome()">🏠 الرئيسية</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MASCOT -->
+  <div id="mascot" class="mascot" onclick="mascotTalkRandom()" title="اضغط علي!">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="60" r="32" fill="#FFD93D" />
+      <circle cx="50" cy="52" r="26" fill="#FFEC99" />
+      <circle cx="40" cy="46" r="6" fill="white" />
+      <circle cx="60" cy="46" r="6" fill="white" />
+      <circle cx="41" cy="47" r="3.5" fill="#1a1a1a">
+        <animate attributeName="cx" values="41;43;41" dur="3s" repeatCount="indefinite" />
+      </circle>
+      <circle cx="61" cy="47" r="3.5" fill="#1a1a1a">
+        <animate attributeName="cx" values="61;63;61" dur="3s" repeatCount="indefinite" />
+      </circle>
+      <path d="M38,60 Q50,72 62,60" fill="none" stroke="#FF6B6B" stroke-width="3" stroke-linecap="round" />
+      <circle cx="32" cy="58" r="7" fill="#FF8FAB" opacity=".5" />
+      <circle cx="68" cy="58" r="7" fill="#FF8FAB" opacity=".5" />
+      <circle cx="22" cy="45" r="10" fill="#FFD93D" />
+      <circle cx="78" cy="45" r="10" fill="#FFD93D" />
+      <circle cx="22" cy="45" r="6" fill="#FF8FAB" />
+      <circle cx="78" cy="45" r="6" fill="#FF8FAB" />
+      <polygon points="50,12 53,22 63,22 55,28 58,38 50,32 42,38 45,28 37,22 47,22" fill="#FF922B" opacity=".9" />
+    </svg>
+  </div>
+  <div class="speech-bubble" id="speechBubble">مرحباً! 🌟</div>
+
+  <!-- TEACHER CREDIT -->
+  <div class="teacher-credit">
+    إنشاء وتصميم المعلمة / عائشة النعيمي &nbsp;|&nbsp; مدرسة الخريطيات الابتدائية للبنات
+  </div>
+
+  <script>
+    // ============================================================
+    // AUDIO SYSTEM
+    // ============================================================
+    const AUDIO_PATH = 'audio/';
+    let currentAudio = null;
+
+    function playAudioFile(filename, onEnd) {
+      if (!filename) return null;
+      try {
+        if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+        const a = new Audio(AUDIO_PATH + filename);
+        a.volume = 1;
+        currentAudio = a;
+        a.play().catch(() => { });
+        if (onEnd) a.addEventListener('ended', onEnd, { once: true });
+        return a;
+      } catch (e) { return null; }
+    }
+    function stopAudio() { if (currentAudio) { currentAudio.pause(); currentAudio = null; } }
+
+    // Web Audio fallback tones
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let actx = null;
+    function ensureAudio() { if (!actx) try { actx = new AudioCtx(); } catch (e) { } }
+    function playTone(f, t, d, v, dl) { try { ensureAudio(); if (!actx) return; const tm = actx.currentTime + dl; const o = actx.createOscillator(); const g = actx.createGain(); o.connect(g); g.connect(actx.destination); o.type = t; o.frequency.setValueAtTime(f, tm); g.gain.setValueAtTime(v, tm); g.gain.exponentialRampToValueAtTime(.001, tm + d); o.start(tm); o.stop(tm + d); } catch (e) { } }
+    function playCorrectTone() { playTone(523, 'sine', .12, .3, 0); playTone(659, 'sine', .12, .3, .12); playTone(784, 'sine', .18, .3, .24); playTone(1047, 'sine', .3, .3, .4); }
+    function playWrongTone() { playTone(200, 'sawtooth', .2, .3, 0); playTone(150, 'sawtooth', .2, .3, .2); }
+    function playClick() { playTone(800, 'sine', .06, .12, 0); }
+    function playLevelUp() { [523, 659, 784, 1047, 1319].forEach((f, i) => playTone(f, 'sine', .15, .22, i * .1)); }
+
+    // ============================================================
+    // ========== QUESTIONS — مصحّحة من الورقة الأصلية ===========
+    // ============================================================
+
+    // ========== السؤال 1: الضمائر وأسماء الإشارة (25 سؤال) ==========
+    const pronounQuestions = [
+      // --- الضمائر ---
+      {
+        q: "قَطَرِيٌّ يَفْتَخِرُ بِوَطَنِهِ — _____",
+        opts: ["هُوَ", "هِيَ", "هُمَا"],
+        ans: "هُوَ",
+        audio: "new/قَطَرِيٌّ يَفْتَخِرُ بِوَطَنِهِ.wav"
+      },
+      {
+        q: "قَطَرِيَّةٌ تَفْتَخِرُ بِوَطَنِها — _____",
+        opts: ["هُوَ", "هِيَ", "هُمَا"],
+        ans: "هِيَ",
+        audio: "new/قَطَرِيَّةٌ تَفْتَخِرُ بِوَطَنِها.wav"
+      },
+      {
+        q: "يُنَظِّمُونَ وَقْتَهُمْ — _____",
+        opts: ["هُوَ", "هُمَا", "هُمْ"],
+        ans: "هُمْ",
+        audio: "q_pr_03.mp3"
+      },
+      {
+        q: "تُنَظِّمُ وَقْتَهَا — _____",
+        opts: ["هُوَ", "هِيَ", "هُمْ"],
+        ans: "هِيَ",
+        audio: "q_pr_04.mp3"
+      },
+      {
+        q: "يَقْرَأُ الدَّرْسَ — _____",
+        opts: ["هُوَ", "هِيَ", "هُمْ"],
+        ans: "هُوَ",
+        audio: "q_pr_05.mp3"
+      },
+      {
+        q: "طُلَّابٌ مُجْتَهِدُونَ — _____",
+        opts: ["هُوَ", "هُمَا", "هُمْ"],
+        ans: "هُمْ",
+        audio: "new/طُلَّابٌ مُجْتَهِدُونَ.wav"
+      },
+      {
+        q: "يُنَظِّمُ وَقْتَهُ — _____",
+        opts: ["هُوَ", "هُمَا", "هُمْ"],
+        ans: "هُوَ",
+        audio: "new/يُنَظِّمُ وَقْتَهُ.wav"
+      },
+      {
+        q: "يُنَظِّمَانِ وَقْتَهُمَا — _____",
+        opts: ["هُوَ", "هُمَا", "هُمْ"],
+        ans: "هُمَا",
+        audio: "q_pr_08.mp3"
+      },
+      {
+        q: "تُنَظِّمَانِ وَقْتَهُمَا — _____",
+        opts: ["هُوَ", "هُمَا", "هُمْ"],
+        ans: "هُمَا",
+        audio: "q_pr_09.mp3"
+      },
+      // --- أسماء الإشارة للقريب ---
+      {
+        q: "_____ لَاعِبَانِ نَشِيطَانِ.",
+        opts: ["هَذَا", "هَذَانِ", "هَؤُلَاءِ"],
+        ans: "هَذَانِ",
+        audio: "q_pr_10.mp3"
+      },
+      {
+        q: "_____ مُعَلِّمَةُ حَاسُوبٍ.",
+        opts: ["هَذَا", "هَذِهِ", "هَؤُلَاءِ"],
+        ans: "هَذِهِ",
+        audio: "q_pr_11.mp3"
+      },
+      {
+        q: "_____ طَبِيبَاتٌ مَاهِرَاتٌ.",
+        opts: ["هَذَا", "هَاتَانِ", "هَؤُلَاءِ"],
+        ans: "هَؤُلَاءِ",
+        audio: "q_pr_12.mp3"
+      },
+      {
+        q: "_____ طَائِرَتَانِ قَطَرِيَّتَانِ.",
+        opts: ["هَاتَانِ", "هَذِهِ", "هَؤُلَاءِ"],
+        ans: "هَاتَانِ",
+        audio: "q_pr_13.mp3"
+      },
+      {
+        q: "_____ عَلَمُ بِلَادِي قَطَرَ.",
+        opts: ["هَذَا", "هَذِهِ", "هَؤُلَاءِ"],
+        ans: "هَذَا",
+        audio: "q_pr_14.mp3"
+      },
+      {
+        q: "_____ مَلَاعِقُ طَعَامٍ.",
+        opts: ["هَذَا", "هَذِهِ", "هَؤُلَاءِ"],
+        ans: "هَذِهِ",
+        audio: "q_pr_15.mp3"
+      },
+      {
+        q: "_____ أَكْوَابُ مَاءٍ.",
+        opts: ["هَذِهِ", "هَذَا", "هَؤُلَاءِ"],
+        ans: "هَذِهِ",
+        audio: "new/أَكْوَابُ مَاءٍ..wav"
+      },
+      {
+        q: "_____ أُسُودٌ مُفْتَرِسَةٌ.",
+        opts: ["هَذَا", "هَؤُلَاءِ", "هَذِهِ"],
+        ans: "هَذِهِ",
+        audio: "new/أُسُودٌ مُفْتَرِسَةٌ..wav"
+      },
+      {
+        q: "_____ جُنُودٌ شُجْعَانٌ.",
+        opts: ["هَذَا", "هَذَانِ", "هَؤُلَاءِ"],
+        ans: "هَؤُلَاءِ",
+        audio: "new/جُنُودٌ شُجْعَانٌ.wav"
+      },
+      // --- أسماء الإشارة للبعيد ---
+      {
+        q: "_____ طَائِرَةٌ تَطِيرُ فِي السَّمَاءِ.",
+        opts: ["هَذَا", "ذَلِكَ", "تِلْكَ"],
+        ans: "تِلْكَ",
+        audio: "new/طَائِرَةٌ تَطِيرُ فِي السَّمَاءِ..wav"
+      },
+      {
+        q: "_____ عُصْفُورٌ يَطِيرُ بَعِيدًا.",
+        opts: ["هَذِهِ", "ذَلِكَ", "تِلْكَ"],
+        ans: "ذَلِكَ",
+        audio: "new/عُصْفُورٌ يَطِيرُ بَعِيدًا..wav"
+      },
+      {
+        q: "كَوْكَبٌ جَمِيلٌ — _____",
+        opts: ["هَذِهِ", "ذَلِكَ", "تِلْكَ"],
+        ans: "ذَلِكَ",
+        audio: "new/كَوْكَبٌ جَمِيلٌ.wav"
+      },
+      {
+        q: "جَبَلٌ شَامِخٌ — _____",
+        opts: ["هَذِهِ", "ذَلِكَ", "تِلْكَ"],
+        ans: "ذَلِكَ",
+        audio: "new/جَبَلٌ شَامِخٌ.wav"
+      },
+      {
+        q: "سَمَاءٌ صَافِيَةٌ — _____",
+        opts: ["هَذَا", "ذَلِكَ", "تِلْكَ"],
+        ans: "تِلْكَ",
+        audio: "new/سَمَاءٌ صَافِيَةٌ.wav"
+      },
+      {
+        q: "قَمَرٌ مُنِيرٌ — _____",
+        opts: ["هَذِهِ", "ذَلِكَ", "تِلْكَ"],
+        ans: "ذَلِكَ",
+        audio: "new/قَمَرٌ مُنِيرٌ.wav"
+      },
+      {
+        q: "شَمْسٌ سَاطِعَةٌ — _____",
+        opts: ["هَذَا", "ذَلِكَ", "تِلْكَ"],
+        ans: "تِلْكَ",
+        audio: "new/شَمْسٌ سَاطِعَةٌ — ؟؟؟.wav"
+      },
+    ];
+
+    // ========== السؤال 2: المفرد والمثنى والجمع (4 أسئلة) ==========
+    const numbersQuestions = [
+      {
+        q: "اختر مثنى كلمة: طَالِبٌ",
+        emoji: "👦",
+        opts: ["طَالِبَانِ", "طُلَّابٌ", "طَالِبَةٌ", "طَالِبَاتٌ"],
+        ans: "طَالِبَانِ",
+        audio: "q_nm_01.mp3"
+      },
+      {
+        q: "اختر جمع كلمة: طَالِبٌ",
+        emoji: "👦👦👦",
+        opts: ["طُلَّابٌ", "طَالِبَانِ", "طَالِبَةٌ", "طَالِبَاتٌ"],
+        ans: "طُلَّابٌ",
+        audio: "q_nm_02.mp3"
+      },
+      {
+        q: "اختر مثنى كلمة: طَالِبَةٌ",
+        emoji: "👧",
+        opts: ["طَالِبَتَانِ", "طَالِبَاتٌ", "طَالِبَانِ", "طُلَّابٌ"],
+        ans: "طَالِبَتَانِ",
+        audio: "q_nm_03.mp3"
+      },
+      {
+        q: "اختر جمع كلمة: طَالِبَةٌ",
+        emoji: "👧👧👧",
+        opts: ["طَالِبَاتٌ", "طَالِبَتَانِ", "طُلَّابٌ", "طَالِبَانِ"],
+        ans: "طَالِبَاتٌ",
+        audio: "q_nm_04.mp3"
+      },
+      {
+        q: "اختر مثنى كلمة: مُعَلِّمٌ",
+        emoji: "👨‍🏫",
+        opts: ["مُعَلِّمَانِ", "مُعَلِّمُونَ", "مُعَلِّمَةٌ", "مُعَلِّمَاتٌ"],
+        ans: "مُعَلِّمَانِ",
+        audio: "q_nm_05.mp3"
+      },
+      {
+        q: "اختر جمع كلمة: مُعَلِّمٌ",
+        emoji: "👨‍🏫👨‍🏫👨‍🏫",
+        opts: ["مُعَلِّمُونَ", "مُعَلِّمَانِ", "مُعَلِّمَةٌ", "مُعَلِّمَاتٌ"],
+        ans: "مُعَلِّمُونَ",
+        audio: "q_nm_06.mp3"
+      },
+      {
+        q: "اختر مثنى كلمة: مُعَلِّمَةٌ",
+        emoji: "👩‍🏫",
+        opts: ["مُعَلِّمَتَانِ", "مُعَلِّمَاتٌ", "مُعَلِّمَانِ", "مُعَلِّمُونَ"],
+        ans: "مُعَلِّمَتَانِ",
+        audio: "q_nm_07.mp3"
+      },
+      {
+        q: "اختر جمع كلمة: مُعَلِّمَةٌ",
+        emoji: "👩‍🏫👩‍🏫👩‍🏫",
+        opts: ["مُعَلِّمَاتٌ", "مُعَلِّمَتَانِ", "مُعَلِّمُونَ", "مُعَلِّمَانِ"],
+        ans: "مُعَلِّمَاتٌ",
+        audio: "q_nm_08.mp3"
+      },
+    ];
+
+    // ========== السؤال 3: حروف الجر (10 أسئلة) ==========
+    const prepositionQuestions = [
+      {
+        q: "تَجْلِسُ الْقِطَّةُ _____ الْكُرْسِيِّ.",
+        opts: ["فَوْقَ", "تَحْتَ", "أَمَامَ", "خَلْفَ"],
+        ans: "فَوْقَ",
+        imgEmoji: "🐱🪑", imgDesc: "القطة فوق الكرسي", img: "img/cat_chair.png",
+        audio: "new/تَجْلِسُ الْقِطَّةُ ؟؟؟ الْكُرْسِيِّ..wav"
+      },
+      {
+        q: "السَّيَّارَةُ _____ الْحَافِلَةِ.",
+        opts: ["أَمَامَ", "خَلْفَ", "فَوْقَ", "تَحْتَ"],
+        ans: "خَلْفَ",
+        imgEmoji: "🚗🚌", imgDesc: "السيارة خلف الحافلة", img: "img/car_bus.png",
+        audio: "new/السَّيَّارَةُ ؟؟؟ الْحَافِلَةِ..wav"
+      },
+      {
+        q: "الْعُصْفُورُ _____ الشَّجَرَةِ.",
+        opts: ["فَوْقَ", "تَحْتَ", "أَمَامَ", "خَلْفَ"],
+        ans: "فَوْقَ",
+        imgEmoji: "🐦🌳", imgDesc: "العصفور فوق الشجرة", img: "img/bird_tree.png",
+        audio: "new/الْعُصْفُورُ ؟؟؟ الشَّجَرَةِ..wav"
+      },
+      {
+        q: "الْبِنْتُ تَخْتَبِئُ _____ الطَّاوِلَةِ.",
+        opts: ["تَحْتَ", "فَوْقَ", "أَمَامَ", "خَلْفَ"],
+        ans: "تَحْتَ",
+        imgEmoji: "👧🪑", imgDesc: "البنت تحت الطاولة", img: "img/girl_table.png",
+        audio: "new/الْبِنْتُ تَخْتَبِئُ ؟؟؟ الطَّاوِلَةِ..wav"
+      },
+      {
+        q: "الشُّرْطِيُّ _____ الْمِظَلَّةِ.",
+        opts: ["أَمَامَ", "خَلْفَ", "فَوْقَ", "تَحْتَ"],
+        ans: "أَمَامَ",
+        imgEmoji: "👮☂️", imgDesc: "الشرطي أمام المظلة", img: "img/police_umbrella.png",
+        audio: "new/الشُّرْطِيُّ ؟؟؟ الْمِظَلَّةِ..wav"
+      },
+      {
+        q: "الْعُصْفُورُ _____ السَّيَّارَةِ.",
+        opts: ["فَوْقَ", "تَحْتَ", "أَمَامَ", "خَلْفَ"],
+        ans: "فَوْقَ",
+        imgEmoji: "🐦🚗", imgDesc: "العصفور فوق السيارة", img: "img/bird_car.png",
+        audio: "new/الْعُصْفُورُ ...السَّيَّارَةِ..wav"
+      },
+      {
+        q: "الْوَلَدُ _____ الْبَابِ.",
+        opts: ["أَمَامَ", "خَلْفَ", "فَوْقَ", "تَحْتَ"],
+        ans: "أَمَامَ",
+        imgEmoji: "👦🚪", imgDesc: "الولد أمام الباب", img: "img/boy_door.png",
+        audio: "new/الْوَلَدُ ؟؟؟ الْبَابِ..wav"
+      },
+      {
+        q: "جَلَسَتْ سَارَةُ _____ الْمِظَلَّةِ.",
+        opts: ["تَحْتَ", "فَوْقَ", "أَمَامَ", "خَلْفَ"],
+        ans: "تَحْتَ",
+        imgEmoji: "👧☂️", imgDesc: "سارة تحت المظلة", img: "img/sara_umbrella.png",
+        audio: "new/جَلَسَتْ سَارَةُ ؟؟؟ الْمِظَلَّةِ..wav"
+      },
+      {
+        q: "جَلَسَ رَاشِدٌ _____ الْحَاسُوبِ.",
+        opts: ["أَمَامَ", "خَلْفَ", "فَوْقَ", "تَحْتَ"],
+        ans: "أَمَامَ",
+        imgEmoji: "👦💻", imgDesc: "راشد أمام الحاسوب", img: "img/rashid_computer.png",
+        audio: "new/جَلَسَ رَاشِدٌ ؟؟؟ الْحَاسُوبِ..wav"
+      },
+      {
+        q: "اخْتَفَتِ الشَّمْسُ _____ الْغُيُومِ.",
+        opts: ["خَلْفَ", "أَمَامَ", "فَوْقَ", "تَحْتَ"],
+        ans: "خَلْفَ",
+        imgEmoji: "☁️🌤️", imgDesc: "الشمس خلف الغيوم", img: "img/sun_clouds.png",
+        audio: "q_pp_10.mp3"
+      },
+    ];
+
+    // ============================================================
+    // GAME STATE
+    // ============================================================
+    let currentQuestions = [], currentIndex = 0, score = 0, selectedMode = '', answered = false;
+
+    // ============================================================
+    // PARTICLES
+    // ============================================================
+    const canvas = document.getElementById('starsCanvas');
+    const ctx2 = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+    function spawnStars(x, y, n) { const cols = ['#FFD93D', '#FF6B6B', '#6BCB77', '#4D96FF', '#CC5DE8', '#FF922B']; for (let i = 0; i < n; i++) { const a = (Math.PI * 2 / n) * i + Math.random() * .5, sp = Math.random() * 8 + 3; particles.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 4, color: cols[Math.floor(Math.random() * cols.length)], size: Math.random() * 12 + 6, life: 1, decay: Math.random() * .022 + .015, type: Math.random() < .5 ? 'star' : 'circle' }); } }
+    function drawStar(c, x, y, r, col) { c.fillStyle = col; c.beginPath(); for (let i = 0; i < 5; i++) { const a = (Math.PI * 2 / 5) * i - Math.PI / 2, ai = a + Math.PI / 5; i === 0 ? c.moveTo(x + Math.cos(a) * r, y + Math.sin(a) * r) : c.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); c.lineTo(x + Math.cos(ai) * r * .4, y + Math.sin(ai) * r * .4); } c.closePath(); c.fill(); }
+    function animP() { ctx2.clearRect(0, 0, canvas.width, canvas.height); particles = particles.filter(p => p.life > 0); particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .2; p.life -= p.decay; ctx2.globalAlpha = p.life; if (p.type === 'star') drawStar(ctx2, p.x, p.y, p.size, p.color); else { ctx2.fillStyle = p.color; ctx2.beginPath(); ctx2.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2); ctx2.fill(); } }); ctx2.globalAlpha = 1; requestAnimationFrame(animP); }
+    animP();
+
+    function createBubbles() { const c = document.getElementById('bgBubbles'); const cols = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#CC5DE8', '#FF922B']; for (let i = 0; i < 18; i++) { const b = document.createElement('div'); b.className = 'bubble'; const s = Math.random() * 80 + 30; b.style.cssText = `width:${s}px;height:${s}px;left:${Math.random() * 100}%;background:${cols[Math.floor(Math.random() * cols.length)]};animation-duration:${Math.random() * 15 + 8}s;animation-delay:${Math.random() * 10}s;`; c.appendChild(b); } }
+    createBubbles();
+
+    function showFloatingPoints(x, y, t) { const el = document.createElement('div'); el.className = 'points-float'; el.textContent = t; el.style.left = (x - 20) + 'px'; el.style.top = y + 'px'; document.body.appendChild(el); setTimeout(() => el.remove(), 1500); }
+    function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+
+    // ============================================================
+    // MASCOT
+    // ============================================================
+    const mascotData = [
+      { text: "أنت رائع! 🌟", audio: "mascot_encourage1.mp3" },
+      { text: "استمر هكذا! 💪", audio: "mascot_encourage2.mp3" },
+      { text: "أحسنت! 🎉", audio: "mascot_correct1.mp3" },
+      { text: "فكر بتأنٍّ! 🤔", audio: "mascot_encourage3.mp3" },
+      { text: "ثق بنفسك! ✨", audio: "mascot_encourage1.mp3" },
+      { text: "أنا معك! 🏆", audio: "mascot_encourage2.mp3" },
+    ];
+    let mIdx = 0;
+    function mascotTalkRandom() {
+      const d = mascotData[mIdx++ % mascotData.length];
+      showBubble(d.text); playAudioFile(d.audio); playClick();
+    }
+    function showBubble(text) {
+      const b = document.getElementById('speechBubble');
+      b.textContent = text; b.classList.add('show');
+      setTimeout(() => b.classList.remove('show'), 3200);
+    }
+
+    // ============================================================
+    // START GAME
+    // ============================================================
+    function startGame(mode) {
+      playLevelUp(); playAudioFile('mascot_gamestart.mp3');
+      selectedMode = mode;
+      if (mode === 'pronouns') currentQuestions = shuffle([...pronounQuestions]);
+      else if (mode === 'numbers') currentQuestions = shuffle([...numbersQuestions]);
+      else if (mode === 'prepositions') currentQuestions = shuffle([...prepositionQuestions]);
+      else currentQuestions = shuffle([...pronounQuestions, ...numbersQuestions, ...prepositionQuestions]);
+      currentIndex = 0; score = 0; answered = false;
+      document.getElementById('mainScreen').style.display = 'none';
+      document.getElementById('resultScreen').style.display = 'none';
+      document.getElementById('gameScreen').style.display = 'block';
+      document.getElementById('qTotalDisplay').textContent = currentQuestions.length;
+      showQuestion();
+    }
+
+    // ============================================================
+    // SHOW QUESTION
+    // ============================================================
+    function showQuestion() {
+      answered = false;
+      const q = currentQuestions[currentIndex];
+      const num = currentIndex + 1, total = currentQuestions.length;
+      document.getElementById('qNumDisplay').textContent = num;
+      document.getElementById('scoreDisplay').textContent = score;
+      document.getElementById('progressBar').style.width = ((currentIndex / total) * 100) + '%';
+      const card = document.getElementById('questionCard');
+      card.innerHTML = ''; card.style.animation = 'none'; card.offsetHeight; card.style.animation = 'slideIn .4s ease';
+      const wrap = document.createElement('div');
+
+      const qnum = document.createElement('div'); qnum.className = 'q-number';
+      qnum.textContent = `السؤال ${num} من ${total}`; wrap.appendChild(qnum);
+
+      const rb = document.createElement('button'); rb.className = 'read-btn'; rb.id = 'readBtn';
+      rb.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>اسمع السؤال<div class="wave-dots"><span></span><span></span><span></span><span></span><span></span></div>`;
+      rb.onclick = () => { playClick(); playQuestionAudio(q, rb); };
+      wrap.appendChild(rb);
+
+      if (q.imgEmoji) {
+        const iw = document.createElement('div'); iw.style.cssText = 'text-align:center;margin-bottom:15px;';
+        const img = document.createElement('img'); img.src = q.img || ''; img.alt = q.imgDesc || '';
+        img.style.cssText = 'max-height:140px;border-radius:15px;border:3px solid rgba(255,255,255,.15);';
+        img.onerror = () => { iw.innerHTML = `<div style="font-size:3.3rem;background:rgba(255,255,255,.07);border-radius:16px;padding:13px 24px;display:inline-block;border:2px dashed rgba(255,255,255,.2)">${q.imgEmoji}<div style="font-size:.72rem;color:#adb5bd;margin-top:5px">${q.imgDesc || ''}</div></div>`; };
+        iw.appendChild(img); if (!q.img) img.dispatchEvent(new Event('error'));
+        wrap.appendChild(iw);
+      }
+      if (q.emoji) {
+        const ed = document.createElement('div'); ed.style.cssText = 'text-align:center;font-size:3.2rem;margin-bottom:11px;';
+        ed.innerHTML = `<span class="animated-icon">${q.emoji}</span>`; wrap.appendChild(ed);
+      }
+
+      const qt = document.createElement('div'); qt.className = 'q-text';
+      qt.innerHTML = q.q.replace('_____', '<span class="blank">؟؟؟</span>'); wrap.appendChild(qt);
+
+      const grid = document.createElement('div'); grid.className = 'options-grid';
+      shuffle([...q.opts]).forEach(opt => {
+        const btn = document.createElement('button'); btn.className = 'option-btn'; btn.textContent = opt;
+        btn.onclick = () => checkAnswer(btn, opt, q.ans, grid); grid.appendChild(btn);
+      });
+      wrap.appendChild(grid);
+      card.appendChild(wrap);
+
+      const myIndex = currentIndex;
+      setTimeout(() => {
+        if (answered || currentIndex !== myIndex) return;
+        const doPlay = () => {
+          if (!answered && currentIndex === myIndex) {
+            playQuestionAudio(q, document.getElementById('readBtn'));
+          }
+        };
+        if (currentAudio && !currentAudio.paused) {
+          currentAudio.addEventListener('ended', doPlay, { once: true });
+          currentAudio.addEventListener('error', doPlay, { once: true });
+        } else {
+          doPlay();
+        }
+      }, 750);
+    }
+
+    function playQuestionAudio(q, btn) {
+      if (btn) btn.classList.add('playing');
+      const a = playAudioFile(q.audio, () => { if (btn) btn.classList.remove('playing'); });
+      if (a) a.addEventListener('error', () => { if (btn) btn.classList.remove('playing'); speechFallback(q.q, btn); }, { once: true });
+      else { if (btn) btn.classList.remove('playing'); speechFallback(q.q, btn); }
+    }
+    function speechFallback(text, btn) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text.replace('_____', 'الفراغ'));
+      u.lang = 'ar-QA'; u.rate = .85; u.pitch = 1.1;
+      const v = window.speechSynthesis.getVoices().find(v => v.lang.startsWith('ar'));
+      if (v) u.voice = v;
+      if (btn) {
+        btn.classList.add('playing');
+        u.onend = () => btn.classList.remove('playing');
+        u.onerror = () => btn.classList.remove('playing');
+      }
+      window.speechSynthesis.speak(u);
+    }
+
+    // ============================================================
+    // CHECK ANSWER
+    // ============================================================
+    function checkAnswer(btn, selected, correct, grid) {
+      if (answered) return; answered = true; playClick(); stopAudio(); if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      grid.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+      const ok = selected === correct;
+      if (ok) {
+        btn.classList.add('correct'); score++;
+        playCorrectTone();
+        const cs = ['mascot_correct1.mp3', 'mascot_correct2.mp3', 'mascot_correct3.mp3', 'mascot_correct4.mp3'];
+        setTimeout(() => playAudioFile(cs[Math.floor(Math.random() * cs.length)]), 500);
+        showFeedback('⭐ صح! ⭐', '#FFD93D');
+        const r = btn.getBoundingClientRect(); spawnStars(r.left + r.width / 2, r.top + r.height / 2, 25);
+        showFloatingPoints(r.left + r.width / 2, r.top, '+10');
+      } else {
+        btn.classList.add('wrong');
+        grid.querySelectorAll('.option-btn').forEach(b => { if (b.textContent === correct) b.classList.add('correct'); });
+        playWrongTone();
+        const ws = ['mascot_wrong1.mp3', 'mascot_wrong2.mp3'];
+        setTimeout(() => playAudioFile(ws[Math.floor(Math.random() * ws.length)]), 500);
+        showFeedback('حاول مرة أخرى! 💪', '#FF6B6B');
+      }
+      document.getElementById('scoreDisplay').textContent = score;
+      setTimeout(() => { currentIndex++; if (currentIndex >= currentQuestions.length) showResult(); else showQuestion(); }, 1900);
+    }
+    function showFeedback(msg, color) {
+      const o = document.getElementById('feedbackOverlay'), m = document.getElementById('feedbackMsg');
+      m.textContent = msg; m.style.color = color; o.classList.add('show'); setTimeout(() => o.classList.remove('show'), 1400);
+    }
+
+    // ============================================================
+    // RESULT
+    // ============================================================
+    function showResult() {
+      playLevelUp();
+      document.getElementById('gameScreen').style.display = 'none';
+      const rs = document.getElementById('resultScreen'); rs.style.display = 'flex';
+      const total = currentQuestions.length, pct = score / total;
+      let emoji, title, msg, snd;
+      if (pct >= .9) { emoji = '🏆'; title = 'ممتاز!'; msg = 'أداء رائع جداً! أنت نجم اللغة العربية! 🌟'; snd = 'mascot_win3stars.mp3'; }
+      else if (pct >= .7) { emoji = '🎉'; title = 'أحسنت!'; msg = 'عمل جيد جداً! استمر في التدريب! 💪'; snd = 'mascot_win2stars.mp3'; }
+      else { emoji = '💪'; title = 'حاول مرة أخرى!'; msg = 'لا تستسلم! التدريب يصنع الفرق! 🔥'; snd = 'mascot_win1star.mp3'; }
+      document.getElementById('resultEmoji').textContent = emoji;
+      document.getElementById('resultTitle').textContent = title;
+      document.getElementById('resultScore').textContent = `${score} / ${total}`;
+      document.getElementById('resultMsg').textContent = msg;
+      setTimeout(() => playAudioFile(snd), 700);
+      const sr = document.getElementById('starsRow'); sr.innerHTML = '';
+      const sc = pct >= .9 ? 3 : pct >= .7 ? 2 : 1;
+      for (let i = 0; i < 3; i++) { const s = document.createElement('span'); s.className = 'star-big ' + (i < sc ? 'lit' : 'dim'); s.textContent = '⭐'; s.style.animationDelay = (i * .2) + 's'; sr.appendChild(s); if (i < sc) setTimeout(() => spawnStars(window.innerWidth / 2, window.innerHeight / 2, 15), i * 300 + 500); }
+    }
+    function playAgain() { playClick(); startGame(selectedMode); }
+    function goHome() {
+      playClick(); stopAudio();
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      document.getElementById('gameScreen').style.display = 'none';
+      document.getElementById('resultScreen').style.display = 'none';
+      const ms = document.getElementById('mainScreen'); ms.style.display = 'flex'; ms.style.flexDirection = 'column';
+    }
+
+    // INIT
+    document.addEventListener('click', () => ensureAudio(), { once: true });
+    if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
+    setTimeout(() => { showBubble('مرحباً! اضغط للعب! 🌟'); playAudioFile('mascot_welcome.mp3'); }, 1300);
+  </script>
+</body>
+
+</html>
